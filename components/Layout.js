@@ -1,20 +1,42 @@
-import React, { Children } from "react";
+import React from "react";
 import Head from "next/head";
-import { AppBar, Container, Toolbar, Typography } from "@material-ui/core";
+import NextLink from 'next/link';
+import {
+  AppBar,
+  Toolbar,
+  Typography,
+  Container,
+  Link,
+} from '@material-ui/core';
+import useStyles from "../utils/styles";
 
 export default function Layout({ children }) {
+    const classes =useStyles()
   return (
     <div>
       <Head>
         <title>Next Ecommerce</title>
       </Head>
-      <AppBar position="static">
+      <AppBar position="static" className={classes.navbar}>
         <Toolbar>
-          <Typography>Ecommerce</Typography>
+        <NextLink href="/" passHref>
+            <Link>
+              <Typography className={classes.brand}>Next Ecommerce</Typography>
+            </Link>
+          </NextLink>
+          <div className={classes.grow}></div>
+          <div>
+            <NextLink href="/cart" passHref>
+              <Link>Cart</Link>
+            </NextLink>
+            <NextLink href="/signin" passHref>
+              <Link>Sign In</Link>
+            </NextLink>
+          </div>
         </Toolbar>
       </AppBar>
-      <Container>{children}</Container>
-      <footer>
+      <Container className={classes.main}>{children}</Container>
+      <footer className={classes.footer} >
         <Typography>@zed</Typography>
       </footer>
     </div>
