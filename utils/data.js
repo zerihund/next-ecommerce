@@ -28,6 +28,7 @@ const data = {
     },
     {
       name: "Slim Shirt",
+      slug: "slim-shirt",
       category: "Shirts",
       image: "/images/p6.jpg",
       price: 90,
@@ -39,6 +40,7 @@ const data = {
     },
     {
       name: "Classic Pants",
+      slug: "classic-pant",
       category: "Pants",
       image: "/images/p5.jpg",
       price: 75,

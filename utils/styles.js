@@ -26,8 +26,7 @@ const useStyles = makeStyles({
     marginTop: 10,
     textAlign: "center",
   },
-  Button:{
-      backgroundColor: "#FFA500",
-  }
+  
+  
 });
 export default useStyles;

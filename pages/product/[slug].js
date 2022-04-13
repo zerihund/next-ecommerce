@@ -2,27 +2,25 @@ import React from "react";
 import NextLink from "next/link";
 import Image from "next/image";
 import {
-    Grid,
-    Link,
-    List,
-    ListItem,
-    Typography,
-    Card,
-    Button,
-    TextField,
-    CircularProgress,
-    Box,
-  } from '@mui/material'
-import { useRouter } from "next/router";
-import data from "../../utils/data";
+  Grid,
+  Link,
+  List,
+  ListItem,
+  Typography,
+  Card,
+  Button,
+  TextField,
+  CircularProgress,
+  Box,
+} from "@mui/material";
 import Layout from "../../components/Layout";
 import useStyles from "../../utils/styles";
+import Product from "../../models/Product";
+import db from "../../utils/db";
 
-export default function ProductScreen() {
-const classes = useStyles();
-  const router = useRouter();
-  const { slug } = router.query;
-  const product = data.products.find((x) => x.slug === slug);
+export default function ProductScreen(props) {
+  const { product } = props;
+  const classes = useStyles();
   if (!product) {
     return <div>Product Can Not Found</div>;
   }
@@ -48,7 +46,7 @@ const classes = useStyles();
         <Grid item md={3} xs={12}>
           <List>
             <ListItem>
-              <Typography component="h1" variant="h1">
+              <Typography component="h1" variant="">
                 {product.name}
               </Typography>
             </ListItem>
@@ -94,7 +92,11 @@ const classes = useStyles();
                 </Grid>
               </ListItem>
               <ListItem>
-                <Button fullWidth variant="contained" color="primary">
+                <Button
+                  fullWidth
+                  variant="contained"
+                  background-color="primary"
+                >
                   Add to cart
                 </Button>
               </ListItem>
@@ -104,4 +106,18 @@ const classes = useStyles();
       </Grid>
     </Layout>
   );
+}
+
+export async function getServerSideProps(context) {
+  const { params } = context;
+  const { slug } = params;
+
+  await db.connect();
+  const product = await Product.findOne({ slug }).lean();
+  await db.disconnect();
+  return {
+    props: {
+      product: db.convertDocToObj(product),
+    },
+  };
 }
