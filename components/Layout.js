@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useContext } from "react";
 import Head from "next/head";
 import NextLink from "next/link";
 import {
@@ -7,13 +7,17 @@ import {
   Typography,
   Container,
   Link,
+  Switch,
 } from "@material-ui/core";
 import useStyles from "../utils/styles";
 import { ThemeProvider } from "@mui/styles";
-import { createTheme, CssBaseline } from "@mui/material";
+import { Badge, createTheme, CssBaseline } from "@mui/material";
+import { Store } from "../utils/Store";
+import Cookies from "js-cookie";
 
 export default function Layout({ title, description, children }) {
-  const classes = useStyles();
+const {state} = useContext(Store)
+const { cart } = state;
   const theme = createTheme({
     typography: {
       h1: {
@@ -37,6 +41,7 @@ export default function Layout({ title, description, children }) {
       },
     },
   });
+  const classes = useStyles();
   return (
     <div>
       <Head>
@@ -50,14 +55,27 @@ export default function Layout({ title, description, children }) {
           <Toolbar>
             <NextLink href="/" passHref>
               <Link>
-                <Typography className={classes.brand}>Next Ecommerce</Typography>
+                <Typography className={classes.brand}>
+                  Next Ecommerce
+                </Typography>
               </Link>
             </NextLink>
 
             <div className={classes.grow}></div>
             <div>
               <NextLink href="/cart" passHref>
-                <Link>Cart</Link>
+                <Link>
+                  {cart.cartItems.length > 0 ? (
+                    <Badge
+                      color="secondary"
+                      badgeContent={cart.cartItems.length}
+                    >
+                      Cart
+                    </Badge>
+                  ) : (
+                    'Cart'
+                  )}
+                </Link>
               </NextLink>
               <NextLink href="/login" passHref>
                 <Link>Login</Link>

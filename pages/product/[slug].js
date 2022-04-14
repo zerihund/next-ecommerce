@@ -1,4 +1,4 @@
-import React from "react";
+import React, {useContext } from "react";
 import NextLink from "next/link";
 import Image from "next/image";
 import {
@@ -9,21 +9,31 @@ import {
   Typography,
   Card,
   Button,
-  TextField,
-  CircularProgress,
-  Box,
 } from "@mui/material";
 import Layout from "../../components/Layout";
 import useStyles from "../../utils/styles";
 import Product from "../../models/Product";
 import db from "../../utils/db";
+import axios from "axios";
+
+import { Store } from '../../utils/Store';
 
 export default function ProductScreen(props) {
+  const { dispatch } = useContext(Store);
   const { product } = props;
   const classes = useStyles();
   if (!product) {
-    return <div>Product Can Not Found</div>;
+    return <div>Product Not Found</div>;
   }
+  const addToCartHandler = async () => {
+    const { data } = await axios.get(`/api/products/${product._id}`);
+    if (data.countInStock <= 0) {
+      window.alert('Sorry. Product is out of stock');
+      return;
+    }
+    dispatch({ type: 'CART_ADD_ITEM', payload: { ...product, quantity: 1 } });
+  };
+
   return (
     <Layout title={product.name} description={product.description}>
       <div className={classes.section}>
@@ -46,7 +56,7 @@ export default function ProductScreen(props) {
         <Grid item md={3} xs={12}>
           <List>
             <ListItem>
-              <Typography component="h1" variant="">
+              <Typography component="h1" variant="h1">
                 {product.name}
               </Typography>
             </ListItem>
@@ -86,7 +96,7 @@ export default function ProductScreen(props) {
                   </Grid>
                   <Grid item xs={6}>
                     <Typography>
-                      {product.countInStock > 0 ? "In stock" : "Unavailable"}
+                      {product.countInStock > 0 ? 'In stock' : 'Unavailable'}
                     </Typography>
                   </Grid>
                 </Grid>
@@ -95,7 +105,8 @@ export default function ProductScreen(props) {
                 <Button
                   fullWidth
                   variant="contained"
-                  background-color="primary"
+                  color="primary"
+                  onClick={addToCartHandler}
                 >
                   Add to cart
                 </Button>
@@ -107,11 +118,9 @@ export default function ProductScreen(props) {
     </Layout>
   );
 }
-
 export async function getServerSideProps(context) {
   const { params } = context;
   const { slug } = params;
-
   await db.connect();
   const product = await Product.findOne({ slug }).lean();
   await db.disconnect();
