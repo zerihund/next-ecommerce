@@ -1,4 +1,4 @@
-import React, {useContext } from "react";
+import React, { useContext } from "react";
 import NextLink from "next/link";
 import Image from "next/image";
 import {
@@ -16,22 +16,27 @@ import Product from "../../models/Product";
 import db from "../../utils/db";
 import axios from "axios";
 
-import { Store } from '../../utils/Store';
+import { Store } from "../../utils/Store";
+import { useRouter } from "next/router";
 
 export default function ProductScreen(props) {
-  const { dispatch } = useContext(Store);
+  const router = useRouter();
+  const { state, dispatch } = useContext(Store);
   const { product } = props;
   const classes = useStyles();
   if (!product) {
     return <div>Product Not Found</div>;
   }
   const addToCartHandler = async () => {
+    const existItem = state.cart.cartItems.find((x) => x._id === product._id);
+    const quantity = existItem ? existItem.quantity + 1 : 1;
     const { data } = await axios.get(`/api/products/${product._id}`);
-    if (data.countInStock <= 0) {
-      window.alert('Sorry. Product is out of stock');
+    if (data.countInStock <= quantity) {
+      window.alert("Sorry. Product is out of stock");
       return;
     }
-    dispatch({ type: 'CART_ADD_ITEM', payload: { ...product, quantity: 1 } });
+    dispatch({ type: "CART_ADD_ITEM", payload: { ...product, quantity } });
+    router.push("/cart");
   };
 
   return (
@@ -56,7 +61,7 @@ export default function ProductScreen(props) {
         <Grid item md={3} xs={12}>
           <List>
             <ListItem>
-              <Typography component="h1" variant="h1">
+              <Typography component="h1" variant="">
                 {product.name}
               </Typography>
             </ListItem>
@@ -96,7 +101,7 @@ export default function ProductScreen(props) {
                   </Grid>
                   <Grid item xs={6}>
                     <Typography>
-                      {product.countInStock > 0 ? 'In stock' : 'Unavailable'}
+                      {product.countInStock > 0 ? "In stock" : "Unavailable"}
                     </Typography>
                   </Grid>
                 </Grid>
@@ -105,7 +110,7 @@ export default function ProductScreen(props) {
                 <Button
                   fullWidth
                   variant="contained"
-                  color="primary"
+                  color="secondary"
                   onClick={addToCartHandler}
                 >
                   Add to cart
