@@ -11,7 +11,6 @@ import {
 import NextLink from "next/link";
 import Layout from "../components/Layout";
 import Product from "../models/Product";
-import data from "../utils/data";
 import db from "../utils/db";
 import axios from "axios";
 import { useRouter } from "next/router";

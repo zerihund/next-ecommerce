@@ -1,24 +1,29 @@
 import Cookies from "js-cookie";
 import { createContext, useReducer } from "react";
+
 export const Store = createContext();
 const initialState = {
-  //darkMode: Cookies.get('darkMode') === 'ON' ? true : false,
+  darkMode: Cookies.get("darkMode") === "ON" ? true : false,
   cart: {
     cartItems: Cookies.get("cartItems")
       ? JSON.parse(Cookies.get("cartItems"))
       : [],
-
+    shippingAddress: Cookies.get("shippingAddress")
+      ? JSON.stringify(Cookies.get("shippingAddress"))
+      : { location: {} },
     paymentMethod: Cookies.get("paymentMethod")
       ? Cookies.get("paymentMethod")
       : "",
-    shippingAddress: Cookies.get("shippingAddress")
-      ? JSON.stringify(Cookies.get("shippingAddress"))
-      : { location: "" },
   },
+  
 };
 
 function reducer(state, action) {
   switch (action.type) {
+    case "DARK_MODE_ON":
+      return { ...state, darkMode: true };
+    case "DARK_MODE_OFF":
+      return { ...state, darkMode: false };
     case "CART_ADD_ITEM": {
       const newItem = action.payload;
       const existItem = state.cart.cartItems.find(
@@ -50,11 +55,24 @@ function reducer(state, action) {
           },
         },
       };
+    case "SAVE_SHIPPING_ADDRESS_MAP_LOCATION":
+      return {
+        ...state,
+        cart: {
+          ...state.cart,
+          shippingAddress: {
+            ...state.cart.shippingAddress,
+            location: action.payload,
+          },
+        },
+      };
     case "SAVE_PAYMENT_METHOD":
       return {
         ...state,
         cart: { ...state.cart, paymentMethod: action.payload },
       };
+    case "CART_CLEAR":
+      return { ...state, cart: { ...state.cart, cartItems: [] } };
     case "USER_LOGIN":
       return { ...state, userInfo: action.payload };
     case "USER_LOGOUT":
@@ -67,10 +85,12 @@ function reducer(state, action) {
           paymentMethod: "",
         },
       };
+
     default:
       return state;
   }
 }
+
 export function StoreProvider(props) {
   const [state, dispatch] = useReducer(reducer, initialState);
   const value = { state, dispatch };
